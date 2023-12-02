@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .home-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-button:hover {
+            background-color: #2980b9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .total {
+            font-weight: bold;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+
+            table,
+            th,
+            td {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px;
+            }
+        }
+
+        #send , #generatePDF {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #send:hover {
+            background-color: #2980b9;
+        }
+
+    </style>
+</head>
+
+<body>
+    <a id = "home" href="/" class="home-button">Home</a>
+    <h1>Purchase Bill</h1>
+
+    <p>Buyer: {{ user.customer_name }}</p>
+    <p>Address: {{ user.customer_address }}</p>
+    <p>Order Date: {{ user.order_date }}</p>
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+        </tr>
+        <tr>
+            <td>{{ user.product_name }}</td>
+            <td>&#8377;{{ user.product_price }}</td>
+            <td>{{ user.quantity }}</td>
+            <td>&#8377;{{ user.subtotal }}</td>
+        </tr>
+
+        <tr class="total">
+            <td colspan="3">Total</td>
+            <td>&#8377;{{ user.subtotal }}</td>
+        </tr>
+    </table>
+
+    <p>Thank you for your purchase, {{ user.customer_name }}!</p>
+    <br>
+    <a id='send' data-id="{{user.id}}">Send Mail</a>
+    <button id='generatePDF'>Generate PDF</button>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+<script>
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Check if the cookie name matches the desired name
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $(document).on("click", "#send", function() {
+        var userId = $(this).data("id");
+        console.log(userId);
+
+        // Get the CSRF token from the cookie
+        var csrftoken = getCookie('csrftoken');
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'Send_mail' %}",
+            data: {
+                userID: userId,
+                csrfmiddlewaretoken: csrftoken
+            },
+            success: function(data) {
+                if (data.status == true) {
+                    console.log("Send Successful");
+                    alert("Mail Send Successfully")
+                }
+            },
+        });
+    });
+
+    document.getElementById('generatePDF').addEventListener('click', function () {
+        var that = this;
+        var sendElement = document.getElementById('send');
+        var homeElement = document.getElementById('home');
+
+        that.style.display = 'none';
+        sendElement.style.display = 'none';
+        homeElement.style.display = 'none';
+
+        var element = document.body;
+        var opt = {
+            margin: 10,
+            filename: 'purchase_bill.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf(element, opt);
+
+        setTimeout(function () {
+            that.style.display = 'inline-block';
+            sendElement.style.display = 'inline-block';
+            homeElement.style.display = 'inline-block';
+        }, 1);
+    });
+
+    
+
+</script>
+
+</html>

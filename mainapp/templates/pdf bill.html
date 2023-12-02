@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your HTML Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .home-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-button:hover {
+            background-color: #2980b9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .total {
+            font-weight: bold;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            table,
+            th,
+            td {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Purchase Bill</h1>
+
+    <p>Buyer: {{customer_name}}</p>
+    <p>Address: {{customer_address}}</p>
+    <p>Order Date: {{order_date}}</p>
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+        </tr>
+        <tr>
+            <td>{{product_name}}</td>
+            <td>&#8377;{{product_price}}</td>
+            <td>{{quantity}}</td>
+            <td>&#8377;{{subtotal}}</td>
+        </tr>
+
+        <tr class="total">
+            <td colspan="3">Total</td>
+            <td>&#8377;{{subtotal}}</td>
+        </tr>
+    </table>
+
+    <p>Thank you for your purchase, {{customer_name}}!</p>
+</body>
+</html>
